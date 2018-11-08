@@ -8,6 +8,8 @@ install:
   - npm install -g ganache-cli
   - npm install
 script:
+  - truffle compile
+  - truffle migrate --network development
   - npm test
 before_script:
   - sh scripts/rpc.sh &
