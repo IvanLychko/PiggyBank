@@ -1,6 +1,6 @@
 # PiggyBank
 
-[![Build Status](https://travis-ci.com/PiggyBankETH/PiggyBank.svg?branch=master)](https://travis-ci.org/PiggyBankETH/PiggyBank)
+[![Build Status](https://travis-ci.com/PiggyBankETH/PiggyBank.svg)](https://travis-ci.org/PiggyBankETH/PiggyBank)
 
 Smart contracts for PiggyBank
 
