@@ -1,0 +1,51 @@
+{
+  "name": "piggybank",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Solidity contracts piggybank",
+  "main": "y",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "migrate-dev": "truffle migrate --network development",
+    "test": "truffle test",
+    "rpc": "scripts/rpc.sh"
+  },
+  "dependencies": {
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^2.0.2",
+    "truffle": "^4.1.14",
+    "ganache-cli": "^6.1.8"
+  },
+  "devDependencies": {
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^2.0.2",
+    "truffle": "^4.1.14",
+    "ganache-cli": "^6.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PiggyBankETH/PiggyBank.git"
+  },
+  "keywords": [
+    "solidity",
+    "truffle"
+  ],
+  "author": "ShagaleevAlexey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PiggyBankETH/PiggyBank/issues"
+  },
+  "homepage": "https://github.com/PiggyBankETH/PiggyBank#readme"
+}
