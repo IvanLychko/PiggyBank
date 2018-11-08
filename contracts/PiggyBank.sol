@@ -18,7 +18,7 @@ import "./SafeMath.sol";
 
 contract Betting {
 
-    uint8 public constant betCount = 28;
+    uint8 public constant betsCount = 28;
     uint8 public constant betKillCount = 2;
     struct Bet {
         uint256 minSum;     // min value eth for choose this bet
@@ -64,8 +64,8 @@ contract Betting {
     }
 
     function getBetIndex(uint256 _sum) public view returns(uint256) {
-        for (uint i = 0; i < betCount; i++) {
-            if (bets[i].minSum == _sum) return i;
+        for (uint256 i = betsCount - 1; i >= 0; i--) {
+            if (_sum >= bets[i].minSum) return i;
         }
 
         revert('Bet not found');
@@ -99,8 +99,8 @@ contract PiggyBank is Ownable, Betting {
     uint256 public currentRound;
     uint256 public constant defaultRoundTime = 86400;   // 24 hours
     uint256 public constant ownerDistribution = 15;     // 15%
-    uint256 public constant referrerDistribution = 5;     // 5%
-    mapping (address => address) playerToReferrer;
+    uint256 public constant referrerDistribution = 5;   // 5%
+    mapping (address => address) public playerToReferrer;
 
     constructor() public {
 
@@ -118,7 +118,7 @@ contract PiggyBank is Ownable, Betting {
     function _startNewRoundIfNeeded() private {
         if (rounds.length > currentRound) return;
 
-        uint256 roundId = rounds.push(Round(now + defaultRoundTime, 0, 0, 0x0));
+        uint256 roundId = rounds.push(Round(now + defaultRoundTime, 0, 0, 0x0)) - 1;
         emit NewRound(roundId, now);
     }
 
@@ -133,7 +133,7 @@ contract PiggyBank is Ownable, Betting {
 
     function depositRef(address _referrer) payable public {
         uint256 betIndex = getBetIndex(msg.value);
-
+        emit Test(betIndex);
         // close if needed
         _closeRoundIfNeeded();
 

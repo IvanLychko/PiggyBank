@@ -7,7 +7,7 @@ const should = require('chai')
 
 import expectThrow from './helpers/expectThrow';
 
-var PiggyBank = artifacts.require('./piggybank.sol');
+var PiggyBank = artifacts.require('./PiggyBank.sol');
 
 const setNextBlockDelay = function(duration) {
     const id = Date.now()
@@ -107,7 +107,7 @@ contract('PiggyBank', function(accounts) {
     });
 
     it('win any round', async function () {
-        let betsCount = (await piggyBank.betCount()).toNumber();
+        let betsCount = (await piggyBank.betsCount()).toNumber();
 
         for (var i = 0; i < 26; i++) {
             piggyBank = await PiggyBank.new({from: owner});
@@ -126,8 +126,8 @@ contract('PiggyBank', function(accounts) {
         }
     });
 
-    it('winner is ', async function () {
-        let betsCount = (await piggyBank.betCount()).toNumber();
+    it('winner is', async function () {
+        let betsCount = (await piggyBank.betsCount()).toNumber();
         let bet0 = getBet(await piggyBank.getBet(0));
 
         // deposit first user
@@ -146,7 +146,6 @@ contract('PiggyBank', function(accounts) {
             round0 = getRound(await piggyBank.rounds(0));
             expect(round0.winner).to.equal(accounts[i]);
         }
-
     });
 
 });
