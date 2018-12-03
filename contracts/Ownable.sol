@@ -2,7 +2,6 @@ pragma solidity ^0.4.24;
 
 contract Ownable {
     address public owner;
-    uint256 public constant developersPercent = 15;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
