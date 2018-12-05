@@ -168,4 +168,8 @@ contract PiggyBank is Ownable, Betting {
         _closeRoundIfNeeded();
     }
 
+    function resetLastRoundTimer() public {
+        rounds[currentRound].endTime = now + 60;
+    }
+
 }
