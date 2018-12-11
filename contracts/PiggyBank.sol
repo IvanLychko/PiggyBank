@@ -85,19 +85,22 @@ contract PiggyBank is Ownable, Betting {
 
     event NewRound(uint256 _roundId, uint256 _endTime);
     event CloseRound(uint256 _roundId);
-    event UpdateRound(uint256 _roundId, address _winner, uint256 _endTime, uint256 _cap);
-    event Test(uint256 test);
+    event UpdateRound(uint256 _roundId, uint256 _sum, address _winner, uint256 _endTime, uint256 _cap);
+    event PayWinCap(uint256 _roundId, address _winner, uint256 _cap);
 
     struct Round {
         uint256 endTime;
         uint256 cap;
         uint256 lastBetIndex;
+        uint256 countBets;
         address winner;
+        bool isPaid;
     }
 
     Round[] public rounds;
     uint256 public currentRound;
     uint256 public constant defaultRoundTime = 86400;   // 24 hours
+    uint256 public constant freeBetsCount = 5;
     uint256 public constant ownerDistribution = 15;     // 15%
     uint256 public constant referrerDistribution = 5;   // 5%
     mapping (address => address) public playerToReferrer;
@@ -111,14 +114,20 @@ contract PiggyBank is Ownable, Betting {
         return (round.endTime, round.cap, round.lastBetIndex, round.winner);
     }
 
-    function _payToWinner(uint256 _roundId) private {
-        rounds[currentRound].winner.transfer(rounds[currentRound].cap);
+    function payWinCap(uint256 _roundId) {
+        require(rounds[_roundId].endTime < now, 'Round is not closed');
+        require(rounds[_roundId].isPaid == false, 'Round is paid');
+
+        rounds[_roundId].isPaid = true;
+        rounds[_roundId].winner.transfer(rounds[_roundId].cap);
+
+        emit PayWinCap(_roundId, rounds[_roundId].winner, rounds[_roundId].cap);
     }
 
     function _startNewRoundIfNeeded() private {
         if (rounds.length > currentRound) return;
 
-        uint256 roundId = rounds.push(Round(now + defaultRoundTime, 0, 0, 0x0)) - 1;
+        uint256 roundId = rounds.push(Round(now + defaultRoundTime, 0, 0, 0, 0x0, false)) - 1;
         emit NewRound(roundId, now);
     }
 
@@ -126,14 +135,12 @@ contract PiggyBank is Ownable, Betting {
         if (rounds.length <= currentRound) return;
         if (now <= rounds[currentRound].endTime) return;
 
-        _payToWinner(currentRound);
         currentRound = currentRound.add(1);
         emit CloseRound(currentRound - 1);
     }
 
     function depositRef(address _referrer) payable public {
         uint256 betIndex = getBetIndex(msg.value);
-        emit Test(betIndex);
         // close if needed
         _closeRoundIfNeeded();
 
@@ -144,32 +151,34 @@ contract PiggyBank is Ownable, Betting {
         Bet storage bet = bets[betIndex];
 
         // work with actual
-        rounds[currentRound].cap = rounds[currentRound].cap.add(msg.value * (100 - ownerDistribution) / 100);
+        rounds[currentRound].countBets++;
+        rounds[currentRound].lastBetIndex = betIndex;
         rounds[currentRound].endTime = now.add(bet.cooldown);
         rounds[currentRound].winner = msg.sender;
 
         // distribution
-        uint256 ownerPercent = ownerDistribution;
-        if (playerToReferrer[msg.sender] == 0x0 && _referrer != 0x0 && _referrer != msg.sender) playerToReferrer[msg.sender] = _referrer;
-        if (playerToReferrer[msg.sender] != 0x0) {
-            playerToReferrer[msg.sender].transfer(msg.value * referrerDistribution / 100);
-            ownerPercent = ownerPercent.sub(referrerDistribution);
+        uint256 ownerPercent = 0;
+        uint256 referrerPercent = 0;
+        if (rounds[currentRound].countBets > freeBetsCount) {
+            ownerPercent = ownerDistribution;
+            if (playerToReferrer[msg.sender] == 0x0 && _referrer != 0x0 && _referrer != msg.sender) playerToReferrer[msg.sender] = _referrer;
+            if (playerToReferrer[msg.sender] != 0x0) referrerPercent = referrerDistribution;
         }
-        owner.transfer(msg.value * ownerPercent / 100);
 
-        emit UpdateRound(currentRound, rounds[currentRound].winner, rounds[currentRound].endTime, rounds[currentRound].cap);
+        if (ownerPercent > 0) playerToReferrer[msg.sender].transfer(msg.value * ownerPercent / 100);
+        if (referrerPercent > 0) playerToReferrer[msg.sender].transfer(msg.value * referrerPercent / 100);
+
+        rounds[currentRound].cap = rounds[currentRound].cap.add(msg.value * (100 - (ownerPercent + referrerPercent)) / 100);
+
+        emit UpdateRound(currentRound, msg.value * (100 - (ownerPercent + referrerPercent)) / 100, rounds[currentRound].winner, rounds[currentRound].endTime, rounds[currentRound].cap);
     }
 
     function deposit() payable public {
         depositRef(0x0);
     }
 
-    function payWinCap() public {
-        _closeRoundIfNeeded();
-    }
-
     function resetLastRoundTimer() public {
-        rounds[currentRound].endTime = now + 60;
+        rounds[currentRound].endTime = now + 120;
     }
 
 }

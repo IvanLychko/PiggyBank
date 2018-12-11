@@ -41,7 +41,7 @@ function getRound(round) {
         endTime: round[0].toNumber(),
         cap: round[1].toNumber(),
         lastBetIndex: round[2].toNumber(),
-        winner: round[3]
+        winner: round[4]
     }
 }
 
@@ -62,6 +62,9 @@ contract('PiggyBank', function(accounts) {
     const user0 = accounts[1];
     const user1 = accounts[2];
     const user2 = accounts[3];
+    const user3 = accounts[3];
+    const user4 = accounts[4];
+    const user5 = accounts[5];
 
     beforeEach('setup contract for each test', async function () {
         piggyBank = await PiggyBank.new({from: owner});
@@ -88,8 +91,19 @@ contract('PiggyBank', function(accounts) {
 
         let round0 = getRound(await piggyBank.rounds(0));
 
-        expect(round0.cap).to.equal(bet0.minSum * (100 - ownerPercent) / 100);
+        expect(round0.cap).to.equal(bet0.minSum);
         expect(round0.winner).to.equal(user0);
+
+        await piggyBank.deposit({from: user1, value: bet0.minSum});
+        await piggyBank.deposit({from: user2, value: bet0.minSum});
+        await piggyBank.deposit({from: user3, value: bet0.minSum});
+        await piggyBank.deposit({from: user4, value: bet0.minSum});
+        await piggyBank.deposit({from: user5, value: bet0.minSum});
+
+
+        round0 = getRound(await piggyBank.rounds(0));
+
+        expect(round0.cap).to.equal(bet0.minSum * (5 + ((100 - ownerPercent) / 100)));
     });
 
     it('win round', async function () {
@@ -98,7 +112,7 @@ contract('PiggyBank', function(accounts) {
 
         let deposit_receipt = await piggyBank.deposit({from: user0, value: bet0.minSum});
         await setNextBlockDelay(bet0.cooldown + 2);
-        let pay_receipt = await piggyBank.payWinCap({from: user0, gasPrice: 0});
+        let pay_receipt = await piggyBank.payWinCap(0, {from: user0, gasPrice: 0});
 
         let round0 = getRound(await piggyBank.rounds(0));
         let user0_balance = web3.eth.getBalance(user0).toNumber();
@@ -117,7 +131,7 @@ contract('PiggyBank', function(accounts) {
 
             let deposit_receipt = await piggyBank.deposit({from: user0, value: bet.minSum});
             await setNextBlockDelay(bet.cooldown + 2);
-            let pay_receipt = await piggyBank.payWinCap({from: user0, gasPrice: 0});
+            let pay_receipt = await piggyBank.payWinCap(0, {from: user0, gasPrice: 0});
 
             let round0 = getRound(await piggyBank.rounds(0));
             let user0_balance = web3.eth.getBalance(user0).toNumber();
