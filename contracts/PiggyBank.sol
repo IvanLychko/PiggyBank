@@ -166,7 +166,7 @@ contract PiggyBank is Ownable, Betting {
         }
 
         ownerPercent = ownerPercent.sub(referrerPercent);
-        if (ownerPercent > 0) playerToReferrer[msg.sender].transfer(msg.value * ownerPercent / 100);
+        if (ownerPercent > 0) owner.transfer(msg.value * ownerPercent / 100);
         if (referrerPercent > 0) playerToReferrer[msg.sender].transfer(msg.value * referrerPercent / 100);
 
         rounds[currentRound].cap = rounds[currentRound].cap.add(msg.value * (100 - (ownerPercent + referrerPercent)) / 100);
