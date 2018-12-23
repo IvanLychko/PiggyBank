@@ -6,7 +6,7 @@ Smart contracts for PiggyBank
 
 # Deploying contracts
 
-RinkeBy: [0x9964f60f553c4da9b1cf0a9d85ea0411be3ab8a4](https://rinkeby.etherscan.io/address/0x9964f60f553c4da9b1cf0a9d85ea0411be3ab8a4)
+RinkeBy: [0xbfad9c8132d0af81f4316956c7e9d77da96099e3](https://rinkeby.etherscan.io/address/0xbfad9c8132d0af81f4316956c7e9d77da96099e3)
 
 # Test
 1. Install [truffle](http://truffleframework.com) globally with `npm install -g truffle`
