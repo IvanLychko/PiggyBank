@@ -178,8 +178,4 @@ contract PiggyBank is Ownable, Betting {
         depositRef(0x0);
     }
 
-    function resetLastRoundTimer() public {
-        rounds[currentRound].endTime = now + 120;
-    }
-
 }
